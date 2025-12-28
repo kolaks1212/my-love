@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIKA LOVE</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+        cursor: none;
+    }
+
+    .loader-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        transition: opacity 0.8s ease-out;
+    }
+
+    .loader {
+        width: fit-content;
+        font-size: 40px;
+        font-family: monospace;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #0000;
+        -webkit-text-stroke: 1px #000;
+        --g: conic-gradient(#000 0 0) no-repeat text;
+        background: var(--g) 0, var(--g) 1ch, var(--g) 2ch, var(--g) 3ch, var(--g) 4ch, var(--g) 5ch, var(--g) 6ch;
+        background-position-y: 100%, 0;
+        animation: l16 2s linear infinite alternate;
+    }
+
+    .loader:before { content: "Loading"; }
+
+    @keyframes l16 {
+        0% { background-size: 1ch 0, 1ch 0, 1ch 0, 1ch 0, 1ch 0, 1ch 0, 1ch 0 }
+        14.28% { background-size: 1ch 100%, 1ch 0, 1ch 0, 1ch 0, 1ch 0, 1ch 0, 1ch 0 }
+        28.57% { background-size: 1ch 100%, 1ch 100%, 1ch 0, 1ch 0, 1ch 0, 1ch 0, 1ch 0 }
+        42.85% { background-size: 1ch 100%, 1ch 100%, 1ch 100%, 1ch 0, 1ch 0, 1ch 0, 1ch 0 }
+        57.14% { background-size: 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 0, 1ch 0, 1ch 0 }
+        71.43% { background-size: 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 0, 1ch 0 }
+        85.71% { background-size: 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 0 }
+        100% { background-size: 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100%, 1ch 100% }
+    }
+
+    .loader-container.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .heart-trail {
+        position: absolute;
+        width: 35px;
+        height: 35px;
+        pointer-events: none;
+        background: radial-gradient(circle, #ff0000 30%, #ff3333 60%, transparent 80%);
+        box-shadow: 0 0 20px #ff0000, 0 0 35px #ff3333, 0 0 50px #ff0000;
+        clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        animation: heartFall 2.5s ease-out forwards;
+        z-index: 9998;
+    }
+
+    @keyframes heartFall {
+        0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-50%, 350%) scale(1) rotate(360deg);
+        }
+    }
+
+    .container {
+        width: 90%;
+        max-width: 900px;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        z-index: 10;
+    }
+
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .controls { display: flex; justify-content: center; margin-bottom: 20px; }
+
+    select { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
+
+    .image-box {
+        width: 100%;
+        height: 300px;
+        border: 3px solid black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        background: #eee;
+    }
+
+    .image-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    @media (min-width: 768px) { .image-box { height: 450px; } }
+
+    .final-view {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        display: none;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .final-view img {
+        max-width: 90%;
+        max-height: 55vh;
+        object-fit: contain;
+        border-radius: 10px;
+    }
+
+    .final-text {
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 30px;
+        text-shadow: 0 0 20px rgba(255, 0, 0, 0.8),
+                     0 0 40px rgba(255, 20, 147, 0.6);
+        font-family: 'Dancing Script', cursive, sans-serif;
+        letter-spacing: 2px;
+        opacity: 0;
+        font-size: 3.5rem;
+    }
+
+    @media (max-width: 768px) { .final-text { font-size: 2.8rem; margin-top: 25px; } }
+    @media (max-width: 480px) { .final-text { font-size: 2.2rem; margin-top: 20px; letter-spacing: 1.5px; } }
+    @media (max-width: 360px) { .final-text { font-size: 1.9rem; } }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    @keyframes heartbeat {
+        0% { transform: scale(1); }
+        14% { transform: scale(1.3); }
+        28% { transform: scale(1); }
+        42% { transform: scale(1.3); }
+        70% { transform: scale(1); }
+        100% { transform: scale(1); }
+    }
+
+    .final-text.show {
+        animation: 
+            fadeIn 5s ease-in forwards,
+            blink 1.5s ease-in-out 0s 3,
+            heartbeat 1.8s ease-in-out 5s infinite;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+</style>
+</head>
+
+<body>
+
+<div class="loader-container" id="loaderContainer">
+    <div class="loader"></div>
+</div>
+
+<div class="container">
+    <h1>Select Quality Vika :</h1>
+
+    <div class="controls">
+        <select id="qualitySelect">
+            <option value="144" selected>144p(low)</option>
+            <option value="240">240p</option>
+            <option value="360">360p</option>
+            <option value="720">720p</option>
+            <option value="1080">1080p</option>
+            <option value="4k">4K(Ultra HD)</option>
+        </select>
+    </div>
+
+    <div class="image-box">
+        <img id="displayImage" src="" alt="Selected Quality Image">
+    </div>
+</div>
+
+<div id="finalOverlay" class="final-view">
+    <img id="finalImage" src="" alt="4K Ultra HD">
+    <div class="final-text" id="finalText">For You Vika :)</div>
+</div>
+
+<audio id="backgroundMusic" src="middle.mp3" loop preload="none"></audio>
+<audio id="successSound" src="soundq.mp3" preload="none"></audio>
+
+<script>
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('loaderContainer');
+        setTimeout(() => { loader.classList.add('hidden'); }, 500);
+    });
+
+    let lastX = 0, lastY = 0;
+    let moveCounter = 0;
+
+    function createHeartTrail(e) {
+        let x, y;
+
+        if (e.type === 'touchmove') {
+            const touch = e.touches[0];
+            x = touch.clientX;
+            y = touch.clientY;
+        } else {
+            x = e.clientX;
+            y = e.clientY;
+        }
+
+        const distance = Math.hypot(x - lastX, y - lastY);
+        if (distance < 12) return;
+
+        lastX = x;
+        lastY = y;
+        moveCounter++;
+
+        if (moveCounter % 1 !== 0) return;
+
+        const heart = document.createElement('div');
+        heart.classList.add('heart-trail');
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+
+        const size = Math.random() * 15 + 25;
+        heart.style.width = `${size}px`;
+        heart.style.height = `${size}px`;
+
+        const duration = Math.random() * 0.8 + 2;
+        heart.style.animationDuration = `${duration}s`;
+
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), duration * 1000 + 100);
+    }
+
+    document.addEventListener('mousemove', createHeartTrail);
+    document.addEventListener('touchmove', createHeartTrail, { passive: false });
+    document.addEventListener('touchstart', createHeartTrail, { passive: false });
+
+    const images = {
+        "144": "imgqalb4.png",
+        "240": "imgqalb3.png",
+        "360": "imgqalb2.png",
+        "720": "imgqalb1.png",
+        "1080": "imgqalb.png",
+        "4k": "gif.gif"
+    };
+
+    const select = document.getElementById("qualitySelect");
+    const image = document.getElementById("displayImage");
+    const backgroundMusic = document.getElementById("backgroundMusic");
+    const successSound = document.getElementById("successSound");
+    const finalText = document.getElementById("finalText");
+
+    let unlocked = ["144"];
+    let hasPlayedSound = false;
+    let backgroundStarted = false;
+
+    function updateOptions() {
+        Array.from(select.options).forEach(opt => {
+            opt.disabled = !unlocked.includes(opt.value);
+        });
+    }
+
+    updateOptions();
+    image.src = images["144"];
+    unlocked.push("240");
+    updateOptions();
+
+    select.addEventListener("change", function () {
+        const quality = this.value;
+        image.src = images[quality];
+
+        if (!backgroundStarted) {
+            backgroundMusic.play().catch(e => console.log(e));
+            backgroundStarted = true;
+        }
+
+        const qualities = ["144", "240", "360", "720", "1080", "4k"];
+        const currentIndex = qualities.indexOf(quality);
+        if (currentIndex < qualities.length - 1) {
+            const nextQuality = qualities[currentIndex + 1];
+            if (!unlocked.includes(nextQuality)) {
+                unlocked.push(nextQuality);
+                updateOptions();
+            }
+        }
+
+        if (quality === "4k" && !hasPlayedSound) {
+            successSound.play().catch(e => console.log(e));
+            hasPlayedSound = true;
+
+            document.getElementById('finalImage').src = images["4k"];
+            document.getElementById('finalOverlay').style.display = 'flex';
+
+            setTimeout(() => {
+                finalText.classList.add('show');
+            }, 100);
+        }
+    });
+</script>
+
+</body>
+</html>
